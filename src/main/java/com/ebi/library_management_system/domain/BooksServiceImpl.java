@@ -1,5 +1,6 @@
 package com.ebi.library_management_system.domain;
 
+import com.ebi.library_management_system.controller.BooksService;
 import com.ebi.library_management_system.entity.Book;
 import com.ebi.library_management_system.entity.Copy;
 import com.ebi.library_management_system.entity.Customer;

@@ -1,4 +1,4 @@
-package com.ebi.library_management_system.domain;
+package com.ebi.library_management_system.controller;
 
 import com.ebi.library_management_system.model.dto.BookAdditionDto;
 import com.ebi.library_management_system.model.dto.BookResponseDto;

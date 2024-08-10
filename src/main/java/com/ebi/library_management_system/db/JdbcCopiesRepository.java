@@ -24,9 +24,9 @@ public class JdbcCopiesRepository implements Copies {
     @Override
     public List<Copy> getAvailable(Book book) {
         try (PreparedStatement stmt = connection.prepareStatement("""
-                SELECT * FROM library_db.copies WHERE book_id = ? AND NOT EXISTS(
-                    SELECT * FROM library_db.borrow WHERE copy_id=copies.id AND NOT EXISTS(
-                        SELECT * FROM library_db.`return` WHERE borrow_id=borrow.id
+                SELECT * FROM copies WHERE book_id = ? AND NOT EXISTS(
+                    SELECT * FROM borrow WHERE copy_id=copies.id AND NOT EXISTS(
+                        SELECT * FROM `return` WHERE borrow_id=borrow.id
                     )
                 )
                 """)) {
@@ -44,7 +44,7 @@ public class JdbcCopiesRepository implements Copies {
 
     @Override
     public void borrow(Customer customer, Copy copy) {
-        try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO library_db.borrow (customer_id, copy_id, borrowed_at) VALUES ( ? , ? ,CURDATE())")) {
+        try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO borrow (customer_id, copy_id, borrowed_at) VALUES ( ? , ? ,CURDATE())")) {
             stmt.setInt(1, customer.id());
             stmt.setInt(2, copy.id());
             stmt.executeUpdate();
@@ -57,8 +57,8 @@ public class JdbcCopiesRepository implements Copies {
     public boolean returnCopy(Customer customer, Copy copy) {
         int borrowId = -1;
         try (PreparedStatement stmt = connection.prepareStatement("""
-                SELECT id FROM library_db.borrow WHERE copy_id = ? AND customer_id = ? AND NOT EXISTS(
-                    SELECT * FROM library_db.`return` WHERE borrow_id=borrow.id
+                SELECT id FROM borrow WHERE copy_id = ? AND customer_id = ? AND NOT EXISTS(
+                    SELECT * FROM `return` WHERE borrow_id=borrow.id
                 )
                 """)) {
             stmt.setInt(1, copy.id());
@@ -72,7 +72,7 @@ public class JdbcCopiesRepository implements Copies {
         }
 
         try (PreparedStatement stmt = connection.prepareStatement("""
-                  INSERT INTO library_db.`return` (borrow_id, returned_at) VALUES ( ? ,CURDATE())
+                  INSERT INTO `return` (borrow_id, returned_at) VALUES ( ? ,CURDATE())
                 """)) {
             stmt.setInt(1, borrowId);
             stmt.executeUpdate();
@@ -85,9 +85,9 @@ public class JdbcCopiesRepository implements Copies {
     @Override
     public List<Copy> getBorrowed(Customer customer) {
         try (PreparedStatement stmt = connection.prepareStatement("""
-                SELECT * FROM library_db.copies WHERE EXISTS(
-                    SELECT * FROM library_db.borrow WHERE customer_id = ? AND copy_id=copies.id AND NOT EXISTS(
-                        SELECT * FROM library_db.`return` WHERE borrow_id=borrow.id
+                SELECT * FROM copies WHERE EXISTS(
+                    SELECT * FROM borrow WHERE customer_id = ? AND copy_id=copies.id AND NOT EXISTS(
+                        SELECT * FROM `return` WHERE borrow_id=borrow.id
                     )
                 )
                 """)) {

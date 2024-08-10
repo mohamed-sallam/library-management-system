@@ -15,7 +15,7 @@ public class AppConfig {
     @Bean
     public Connection getConnection() {
         try {
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/emp", "root", "root");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/library_db", "root", "root");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -17,7 +17,7 @@ public class JdbcAuthorsRepository implements Authors {
 
   @Override
   public Author getById(int id) {
-    try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM library_db.authors WHERE id = ? LIMIT 1")) {
+    try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM authors WHERE id = ? LIMIT 1")) {
       stmt.setInt(1, id);
       try (ResultSet res = stmt.executeQuery()) {
         if (!res.next())

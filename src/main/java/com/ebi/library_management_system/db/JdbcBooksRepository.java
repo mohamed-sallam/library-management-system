@@ -18,7 +18,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public void add(Book book) {
-        try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO library_db.books (title, author_id, published_at) VALUES ( ? , ? , ? )")) {
+        try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO books (title, author_id, published_at) VALUES ( ? , ? , ? )")) {
             stmt.setString(1, book.title());
             stmt.setInt(2, book.author().id());
             stmt.setDate(3, book.publishedAt());
@@ -30,7 +30,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public List<Book> getAll() {
-        try (Statement stmt = connection.createStatement(); ResultSet res = stmt.executeQuery("SELECT * FROM library_db.books")) {
+        try (Statement stmt = connection.createStatement(); ResultSet res = stmt.executeQuery("SELECT * FROM books")) {
             List<Book> books = new ArrayList<>(res.getFetchSize());
             while (res.next())
                 books.add(new Book(res.getInt("id"), res.getString("title"), authorsRepo.getById(res.getInt("author_id")), res.getDate("published_at")));
@@ -42,7 +42,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public boolean remove(Book book) {
-        try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM library_db.books WHERE id = ?")) {
+        try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM books WHERE id = ?")) {
             stmt.setInt(1, book.id());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -52,7 +52,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public List<Book> getByTitle(String title) {
-        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM library_db.books WHERE title LIKE ?")) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM books WHERE title LIKE ?")) {
             stmt.setString(1, "%" + title + "%");
             try (ResultSet res = stmt.executeQuery()) {
                 List<Book> books = new ArrayList<>(res.getFetchSize());
@@ -67,7 +67,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public List<Book> getByAuthor(String author) {
-        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM library_db.books WHERE author_id IN (SELECT id FROM library_db.authors WHERE full_name LIKE ? )")) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM books WHERE author_id IN (SELECT id FROM authors WHERE full_name LIKE ? )")) {
             stmt.setString(1, "%" + author + "%");
             try (ResultSet res = stmt.executeQuery()) {
                 List<Book> books = new ArrayList<>(res.getFetchSize());
@@ -82,7 +82,7 @@ public class JdbcBooksRepository implements Books {
 
     @Override
     public Book getById(int id) {
-        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM library_db.books WHERE id = ?")) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM books WHERE id = ?")) {
             stmt.setInt(1, id);
             try (ResultSet res = stmt.executeQuery()) {
                 if (!res.next()) return null;
